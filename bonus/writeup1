@@ -1,0 +1,56 @@
+------------------------------
+       PHPMYADMIN ROOT
+------------------------------
+
+******************************************************************* 
+RECONNAISSANCE :
+******************************************************************* 
+
+We used nmap for scanning the network
+ - nmap 192.168.56.1/24
+
+We saw the ip adress of the Boot2Root Machine is 192.168.56.108
+Then we scanning the machine
+ - nmap -sV 192.168.56.108
+
+ The port 80 is open.
+ http://192.168.56.108 in the browser.
+
+ We had scanning the website to find directory or path with dirb.
+ - dirb https://192.168.56.108 -w /usr/share/dirb/wordlists/common.txt
+
+we found    https://192.168.56.108/forum
+            https://192.168.56.108/webmail
+            https://192.168.56.108/phpmyadmin
+            https://192.168.56.108/templates_c
+
+
+
+********************************************************************
+OSINT/FIRST INTRUSION :
+******************************************************************* 
+
+In the page https://192.168.56.108/forum Problem login , we found:
+    - user      : lmezard
+    - password  : !q\]Ej?*5K5cy*AJ
+
+We tried to log with this in page login and success.
+
+In Users page we found and email admin : laurie@borntosec.net
+
+We tried to connect with this email and the same password in webmail page and success.
+In the mail box, there is a mail for db access.
+The mail contains the intructions to connect in the database with root login.
+DB ACCESS
+    - root / Fg-'kKXBj87E:aJ$
+'
+We conneted with this on the phpmyadmin page to access to db.
+
+******************************************************************* 
+                CHANGE USER_TYPE IN FORUM_DB
+*******************************************************************
+
+As we are connect with root in phpmyadmin, we can change the user_type in forum_db.
+
+We have to user_type = 2 for lmezard user and we become root in website
+https://192.168.56.108/forum

