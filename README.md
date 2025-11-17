@@ -1,14 +1,16 @@
-Boot2Root - Projet de cybersécurité (École 42)
+## Boot2Root - Projet de cybersécurité (École 42)
 
 Projet de groupe réalisé avec [Valentin mondor](https://github.com/vmondor)
 
-🚀 Introduction
+## 🚀 Introduction
 
 Boot2Root est un projet de l’école 42 qui consiste à exploiter une machine virtuelle vulnérable afin d’obtenir un accès root. L’objectif est de mettre en pratique des compétences en sécurité offensive, en analyse de vulnérabilités et en exploitation.
 
 Ce projet s’inscrit dans le cursus sécurité de 42, en suivant une approche similaire à des défis de type CTF.
 
-🎯 Objectifs pédagogiques
+---
+
+## 🎯 Objectifs pédagogiques
 
 Approfondir les bases de la cybersécurité offensive
 
@@ -18,7 +20,9 @@ Comprendre les mécanismes de privilège et d’escalade
 
 Apprendre à manipuler des outils de reconnaissance et d’exploitation
 
-🔍 Environnement
+---
+
+## 🔍 Environnement
 
 VM vulnérable fournie
 
@@ -26,7 +30,9 @@ Structure en plusieurs niveaux, nécessitant de passer de compte en compte (ssh,
 
 Objectif final : obtenir un shell root
 
-🛠 Méthodologie (générale)
+---
+
+## 🛠 Méthodologie (générale)
 
 Le parcours complet inclut :
 
@@ -38,7 +44,9 @@ Exploitation de vulnérabilités connues, comme la faille Dirty COW (CVE-2016-51
 
 Recherche de vecteurs dans des configurations faibles ou binaires SUID
 
-📚 Outils utilisés
+---
+
+## 📚 Outils utilisés
 
 nmap
 
@@ -46,7 +54,9 @@ dirbuster
 
 exploit-db
 
-📁 Organisation du repo
+---
+
+## 📁 Organisation du repo
 
 Ce dépôt contient :
 
