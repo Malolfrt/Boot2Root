@@ -50,9 +50,9 @@ Recherche de vecteurs dans des configurations faibles ou binaires SUID
 
 nmap
 
-dirbuster
+dirbuster / gobuster / ffuf
 
-exploit-db
+exploit-db / Metasploit
 
 ---
 
